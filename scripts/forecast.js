@@ -1,33 +1,37 @@
-const appKey = "3lGfnpnWC1PFrpgmaUr9u8Xf1xuAljeh"; 
+class Forecast {
 
-const getCity = async(city) => {
-  const baseUrl = "http://dataservice.accuweather.com/locations/v1/cities/search";
-  const queryParams = `?apikey=${appKey}&q=${city}`;
+  constructor() {
+    this.appKey = "3lGfnpnWC1PFrpgmaUr9u8Xf1xuAljeh";
+  }
 
-  const response = await fetch(baseUrl + queryParams);
-  const data = await response.json();
+  async getCity(city) {
+    const baseUrl = "http://dataservice.accuweather.com/locations/v1/cities/search";
+    const queryParams = `?apikey=${this.appKey}&q=${city}`;
 
-  return data[0];
-};
+    const response = await fetch(baseUrl + queryParams);
+    const data = await response.json();
+
+    return data[0];
+  };
+
+  async getConditions(cityId) {
+    const cityUrl = `http://dataservice.accuweather.com/currentconditions/v1/`;
+    const query = `${cityId}?apikey=${this.appKey}`;
+
+    const response = await fetch(cityUrl + query);
+    const data = await response.json();
+
+    return data[0];
+  };
 
 
-const getConditions = async(cityId) => {
-  const baseUrl = `http://dataservice.accuweather.com/currentconditions/v1/`;
-  const query = `${cityId}?apikey=${appKey}`;
+  async updateCity(city){
+    const cityDetails = await this.getCity(city);
+    const conditions = await this.getConditions(cityDetails.Key);
 
-  const response = await fetch(baseUrl + query);
-  const data = await response.json();
-
-  return data[0];
-};
-
-//getConditions("45449");
-
-
-/*getCity("Rio de Janeiro")
-  .then(data => {
-    return getConditions(data.Key)
-  }).then(data =>{
-    console.log(data);
-  })
-  .catch(err => console.log(err));*/
+    return {
+      cityDetails: cityDetails,
+      conditions: conditions
+    };
+  };
+}
